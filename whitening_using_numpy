@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+%matplotlib inline
+
+d = 2
+n = 50
+
+# データセットのロード
+iris = load_iris()
+
+# setosaの萼片の長さ・幅のみを使う
+X = iris.data[iris.target == 0][:, :d].T  # (2, 50)
+plt.scatter(X[0], X[1])  # 元の散布図
+
+# 平均ベクトル
+mu = np.mean(X, axis=1).reshape((d, 1))  # (2, 1)
+
+# 共分散行列
+Sigma = np.dot((X - mu), (X - mu).T) / n  # (2, 2)
+
+# 無相関化
+lam, S = np.linalg.eig(Sigma)  # 固有値・固有ベクトルに分解
+
+X_dash = np.dot(S.T, X)  # (50, 2)
+plt.scatter(X_dash[0], X_dash[1])  # 無相関化後の散布図
+
+# 白色化
+Lambda = np.diag(lam)  # 固有値の対角化
+
+X_dash = np.dot(
+    np.linalg.inv(np.sqrt(Lambda)),
+    np.dot(S.T, (X - mu))
+)
+plt.scatter(X_dash[0], X_dash[1])  # 白色化後の散布図
